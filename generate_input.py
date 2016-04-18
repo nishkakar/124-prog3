@@ -1,7 +1,7 @@
 import random
 
 def generate_inputs():
-	num_ints = 10
+	num_ints = 100
 	max_int = 10
 	import argparse
 
@@ -14,7 +14,7 @@ def generate_inputs():
 	f = open('input_' + str(file_num) + '.txt', 'w')
 	
 	for i in range(num_ints):
-		r = random.randint(1,10)
+		r = random.randint(1,max_int)
 		f.write(str(r) + '\n')
 
 	f.close()
