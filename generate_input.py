@@ -1,7 +1,8 @@
 import random
 
 def generate_inputs():
-	num_ints = 100
+	num_ints = 10
+	max_int = 10
 	import argparse
 
 	parser = argparse.ArgumentParser(description='Process some integers.')
@@ -10,10 +11,10 @@ def generate_inputs():
 	args = parser.parse_args()
 	file_num = args.file_num
 
-	f = open('inputs/input_' + str(file_num) + '.txt', 'w')
+	f = open('input_' + str(file_num) + '.txt', 'w')
 	
 	for i in range(num_ints):
-		r = random.randint(1,10**12)
+		r = random.randint(1,10)
 		f.write(str(r) + '\n')
 
 	f.close()

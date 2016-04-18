@@ -8,7 +8,6 @@
 #include <time.h>
 #include <math.h>
 
-
 int random_solutions(long long* input) {
     long long group1[100];
     long long group2[100];
@@ -40,7 +39,6 @@ int random_solutions(long long* input) {
 
     return best_residue;
 }
-
 
 int main(int argc, char* argv[]) {
     char* inputfile = argv[1];
