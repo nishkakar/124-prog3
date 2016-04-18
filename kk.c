@@ -19,7 +19,7 @@ typedef struct MaxHeap {
 //inspired by http://robin-thomas.github.io/min-heap/
 
 void enqueue(MaxHeap *h, long long elem) {
-    if(h->size) {
+    if(h->size > 0) {
         h->data = realloc(h->data,((h->size)+1)*sizeof(long long));
     }
     else {
@@ -34,8 +34,8 @@ void enqueue(MaxHeap *h, long long elem) {
     h->data[i] = elem;
 }
 
-void swap(int *n, int *m) {
-    int tmp = *n;
+void swap(long long *n, long long *m) {
+    long long tmp = *n;
     *n = *m;
     *m = tmp;
 }
@@ -57,8 +57,8 @@ void heapify(MaxHeap *h, int i) {
     }
 }
 
-int returnmax(MaxHeap *h) {
-    int maxElt;
+long long returnmax(MaxHeap *h) {
+    long long maxElt;
     maxElt = h->data[0];
     h->size = h->size - 1;
     h->data[0] = h->data[(h->size)];
@@ -67,29 +67,38 @@ int returnmax(MaxHeap *h) {
     return maxElt;
 }
 
+///////KK ALGORITHM//////////////////////////////////////
+long long kk(long long *A) {
+    MaxHeap heap;
+    heap.size = 0;
+
+    for (int i = 0; i < 5; i++) {
+        enqueue(&heap, A[i]);
+    }
+
+    while(heap.size > 1) {
+        long long max1 = returnmax(&heap);
+        long long max2 = returnmax(&heap);
+        enqueue(&heap, max1 - max2);
+    }
+    return heap.data[0];
+}
+
+
 
 int main(int argc, char* argv[]) {
     char* inputfile = argv[1];
-    int num_ints = 10;
+    int num_ints = 5;
 
-    MaxHeap heap;
-
-    long long* input = malloc(10 * sizeof(int));
+    long long* input = malloc(10 * sizeof(long long));
 
     FILE* fp;
     fp = fopen(inputfile, "r");
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < num_ints; i++) {
         fscanf(fp, "%lld", &input[i]);
     }
 
-    // test to see if loading input worked
-    for (int i = 0; i < 10; i++) {
-        printf("%lld\n", input[i]);
-        enqueue(&heap, input[i]);
-    }
-
-    for (int i = 0; i < heap.size; i++) {
-        printf("%lld\n", heap.data[i]);
-    }
+    long long residue = kk(input);
+    printf("Residue:%lld\n", residue);
 }
