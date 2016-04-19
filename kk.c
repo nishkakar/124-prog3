@@ -352,13 +352,20 @@ int main(int argc, char* argv[]) {
 
     char* RR = "repeated_random";
     char* HC = "hill_climbing";
-    char* SA = "simulated_annealing"; 
+    char* SA = "simulated_annealing";
 
-    printf("SA2 Residue:%lld\n", partition(input, SA));
-    printf("HC2 Residue:%lld\n", partition(input, HC));
-    printf("RR2 Residue:%lld\n", partition(input, RR));
+    // printf("RESULTS: \n");
+
+    printf("KK Residue:%lld\n", kk(input));
 
     printf("RR1 Residue:%lld\n", random_move(input, RR));
     printf("HC1 Residue:%lld\n", random_move(input, HC));
     printf("SA1 Residue:%lld\n", random_move(input, SA));
+
+    printf("RR2 Residue:%lld\n", partition(input, RR));
+    printf("HC2 Residue:%lld\n", partition(input, HC));
+    printf("SA2 Residue:%lld\n", partition(input, SA));
+
+    printf("\n");
+    printf("\n");
 }
