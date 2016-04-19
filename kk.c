@@ -274,7 +274,6 @@ long long random_move(long long* input, char* algorithm) {
                 best_residue = new_residue;
         }
         else if (strcmp(algorithm, "hill_climbing") == 0 || strcmp(algorithm, "simulated_annealing") == 0) {
-            // mempcy(new_solution, solution, 100 * sizeof(int));
             intdup(solution, new_solution);
             generate_neighbor_solution(new_solution);
             new_residue = residue(input, new_solution);
@@ -295,7 +294,6 @@ long long random_move(long long* input, char* algorithm) {
             }
         }
     }
-    printf("%d\n", total);
     return best_residue;
 }
 
