@@ -104,9 +104,7 @@ long long kk(long long *A) {
         }
         enqueue(&heap, max1 - max2);
     }
-    int max2 = heap.data[0];
-    free(heap.data);
-    return max2;
+    return heap.data[0];
 }
 
 void generate_random_solution(int* solution) {
@@ -154,12 +152,9 @@ long long hill_climb_2(long long* input) {
     time_t t;
     srand((unsigned) time(&t));
 
-
     generate_random_partition(prepartition);
     sequence_from_partition(new_sequence, prepartition, input);
     long long best_residue = kk(new_sequence);
-    sequence_from_partition(new_sequence, prepartition, input);
-
 
     for (int i = 0; i < 25000; ++i)
     {
@@ -178,28 +173,72 @@ long long hill_climb_2(long long* input) {
         if(residue < best_residue) {
             best_residue = residue;
             sequence_from_partition(new_sequence, new_partition, input);
+            intdup(new_partition, prepartition);
         }
     }
     return best_residue;
 
 }
 
+long long simulated_annealing_2(long long* input) {
+    int prepartition[100];
+    int new_partition[100];
+    long long new_sequence[100];
+    long long neighbor[100];
+    time_t t;
+    srand((unsigned) time(&t));
+
+    generate_random_partition(prepartition);
+    sequence_from_partition(new_sequence, prepartition, input);
+    long long best_residue = kk(new_sequence);
+    long long global_best_residue = best_residue;
+
+    for (int i = 0; i < 25000; ++i)
+    {
+        intdup(prepartition, new_partition);
+
+        int rand_index_i = (int) rand() % 100;
+        int rand_index_j = (int) rand() % 100;
+        int old_index = prepartition[rand_index_i];
+        while(old_index == rand_index_j)
+            rand_index_j = (int) rand() % 100;
+
+        new_partition[rand_index_i] = rand_index_j;
+        sequence_from_partition(neighbor, new_partition, input);
+
+        long long residue = kk(neighbor);
+        if(residue < best_residue) {
+            best_residue = residue;
+            sequence_from_partition(new_sequence, new_partition, input);
+            intdup(new_partition, prepartition);
+        }
+        else {
+            double T = pow(10., 10.) * pow(.8, (double) (i/300));
+            double probability = exp(-(best_residue - global_best_residue)/T);
+            if (((double) rand()/(double) RAND_MAX) <= probability) {
+                best_residue = residue;
+                sequence_from_partition(new_sequence, new_partition, input);
+                intdup(new_partition, prepartition);
+            }
+        }
+        if(best_residue < global_best_residue) {
+            global_best_residue = best_residue;
+        }
+    }
+    return global_best_residue;
+
+}
+
 long long repeated_random_2(long long* input) {
-    long long prepartition[100];
+    int prepartition[100];
+    long long new_sequence[100];
     time_t t;
     srand((unsigned) time(&t));
     long long best_residue = 10E12;
+
     for (int j = 0; j < 25000; j++) {
-        for (int i = 0; i < 100; i++)
-            prepartition[i] = (long long) rand() % 100;
-
-        long long new_sequence[100];
-        for (int i = 0; i < 100; i++)
-            new_sequence[i] = 0;
-
-        for (int i = 0; i < 100; i++)
-            new_sequence[prepartition[i]] += input[i];
-
+        generate_random_partition(prepartition);
+        sequence_from_partition(new_sequence, prepartition, input);
         long long residue = kk(new_sequence);
         if (residue < best_residue) 
             best_residue = residue;
@@ -229,7 +268,7 @@ int main(int argc, char* argv[]) {
 
     char* inputfile = argv[1];
 
-    long long* input = malloc(100 * sizeof(int));
+    long long input[100];
 
     FILE* fp;
     fp = fopen(inputfile, "r");
@@ -238,7 +277,8 @@ int main(int argc, char* argv[]) {
         fscanf(fp, "%lld", &input[i]);
     }
 
-    printf("HC1 Residue:%lld\n", hill_climb_2(input));
+    printf("SA2 Residue:%lld\n", simulated_annealing_2(input));
+    printf("HC2 Residue:%lld\n", hill_climb_2(input));
     printf("RR2 Residue:%lld\n", repeated_random_2(input));
 
 
