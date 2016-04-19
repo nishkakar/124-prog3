@@ -90,6 +90,32 @@ long long kk(long long *A) {
     return heap.data[0];
 }
 
+void generate_random_solution(int* solution) {
+    // int solution[100];
+    time_t t;
+    srand((unsigned) time(&t));
+    for (int i = 0; i < 100; i++) {
+        double r = (double) rand()/(double) RAND_MAX;
+        if (r <= 0.5)
+            solution[i] = -1;
+        else
+            solution[i] = 1;
+    }
+    // return solution;
+}
+
+long long residue(long long* input, int* solution) {
+    int sum_1 = 0;
+    int sum_2 = 0;
+    for (int i = 0; i < 100; i++) {
+        if (solution[i] == 1)
+            sum_1 += input[i];
+        else
+            sum_2 += input[i];
+    }
+    return llabs(sum_1 - sum_2);
+}
+
 long long repeated_random_2(long long* input) {
     long long prepartition[100];
     time_t t;
@@ -115,36 +141,17 @@ long long repeated_random_2(long long* input) {
 }
 
 long long repeated_random_1(long long* input) {
-    long long group1[100];
-    long long group2[100];
-    long long best_residue = 10E12;
-    time_t t;
-    srand((unsigned) time(&t));
+    int solution[100];
+    generate_random_solution(solution);
+    long long best_residue = residue(input, solution);
+    long long new_residue;
     for (int i = 0; i < 25000; i++) {
-        for (int j = 0; j < 100; j++) {
-            double r = (double) rand()/(double) RAND_MAX;
-            if (r <= 0.5) {
-                group1[j] = input[j];
-                group2[j] = 0; 
-            }
-            else {
-                group1[j] = 0;
-                group2[j] = input[j];
-            }
-        }
-
-        long long sum1 = 0;
-        long long sum2 = 0;
-        for (int j = 0; j < 100; j++) {
-            sum1 += group1[j];
-            sum2 += group2[j];
-        }
-        long long residue = llabs(sum1 - sum2);
-        // printf("residue: %lld\n", residue);
-        if (residue < best_residue) 
-            best_residue = residue;
+        int new_solution[100];
+        generate_random_solution(new_solution);
+        new_residue = residue(input, new_solution);
+        if (new_residue < best_residue)
+            best_residue = new_residue;
     }
-
     return best_residue;
 }
 
