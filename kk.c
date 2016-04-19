@@ -9,19 +9,76 @@
 #include <math.h>
 #include <string.h>
 
-// void print_int_sequence(int* sequence) {
-//     for (int i = 0; i < 100; i++) {
-//         printf("%d\n", sequence[i]);
-//     }
-//     printf("\n\n\n");
-// }
+////HELPER FUNCTIONS//////
 
-// void print_sequence(long long* sequence) {
-//     for (int i = 0; i < 100; i++) {
-//         printf("%lld\n", sequence[i]);
-//     }
-//     printf("\n\n\n");
-// }
+void intdup(int* src, int* dest)
+{
+    for (int i = 0; i < 100; i++) {
+        dest[i] = src[i];
+    }
+}
+
+void print_int_sequence(int* sequence) {
+    for (int i = 0; i < 100; i++) {
+        printf("%d\n", sequence[i]);
+    }
+    printf("\n\n\n");
+}
+
+void print_sequence(long long* sequence) {
+    for (int i = 0; i < 100; i++) {
+        printf("%lld\n", sequence[i]);
+    }
+    printf("\n\n\n");
+}
+
+void generate_random_solution(int* solution) {
+    time_t t;
+    for (int i = 0; i < 100; i++) {
+        double r = (double) rand()/(double) RAND_MAX;
+        if (r <= 0.5)
+            solution[i] = -1;
+        else
+            solution[i] = 1;
+    }
+}
+
+void generate_neighbor_solution(int* solution) {
+    time_t t;
+    int index_1 = (int) rand() % 100;
+    int index_2 = 0;
+    while (index_2 == index_1)
+        index_2 = (int) rand() % 100;
+    solution[index_1] *= -1;
+    double probablity = (double) rand()/(double) RAND_MAX;
+    if (probablity <= 0.5)
+        solution[index_2] *= -1;
+}
+
+long long residue(long long* input, int* solution) {
+    int sum_1 = 0;
+    int sum_2 = 0;
+    for (int i = 0; i < 100; i++) {
+        if (solution[i] == 1)
+            sum_1 += input[i];
+        else
+            sum_2 += input[i];
+    }
+    return llabs(sum_1 - sum_2);
+}
+
+void sequence_from_partition(long long* new_sequence, int* partition, long long * input) {
+    for (int i = 0; i < 100; i++)
+        new_sequence[i] = 0;
+
+    for (int i = 0; i < 100; i++)
+        new_sequence[partition[i]] += input[i];
+}
+
+void generate_random_partition(int* partition) {
+    for (int i = 0; i < 100; i++)
+        partition[i] = (int) rand() % 100;
+}
 
 //MAX HEAP (heap is an array)
 //inspired by http://robin-thomas.github.io/min-heap/
@@ -71,13 +128,6 @@ void heapify(MaxHeap *h, int i) {
     }
 }
 
-void intdup(int* src, int* dest)
-{
-    for (int i = 0; i < 100; i++) {
-        dest[i] = src[i];
-    }
-}
-
 long long returnmax(MaxHeap *h) {
     long long maxElt;
     maxElt = h->data[0];
@@ -87,6 +137,8 @@ long long returnmax(MaxHeap *h) {
     heapify(h, 0);
     return maxElt;
 }
+
+///KK ALGORITHM/////////////
 
 long long kk(long long *A) {
     MaxHeap heap;
@@ -104,57 +156,9 @@ long long kk(long long *A) {
         }
         enqueue(&heap, max1 - max2);
     }
-    return heap.data[0];
-}
-
-void generate_random_solution(int* solution) {
-    time_t t;
-    srand((unsigned) time(&t));
-    for (int i = 0; i < 100; i++) {
-        double r = (double) rand()/(double) RAND_MAX;
-        if (r <= 0.5)
-            solution[i] = -1;
-        else
-            solution[i] = 1;
-    }
-}
-
-void generate_neighbor_solution(int* solution) {
-    time_t t; 
-    srand((unsigned) time(&t));
-    int index_1 = (int) rand() % 100;
-    int index_2 = 0;
-    while (index_2 == index_1)
-        index_2 = (int) rand() % 100;
-    solution[index_1] *= -1;
-    double probablity = (double) rand()/(double) RAND_MAX;
-    if (probablity <= 0.5)
-        solution[index_2] *= -1;
-}
-
-long long residue(long long* input, int* solution) {
-    int sum_1 = 0;
-    int sum_2 = 0;
-    for (int i = 0; i < 100; i++) {
-        if (solution[i] == 1)
-            sum_1 += input[i];
-        else
-            sum_2 += input[i];
-    }
-    return llabs(sum_1 - sum_2);
-}
-
-void sequence_from_partition(long long* new_sequence, int* partition, long long * input) {
-    for (int i = 0; i < 100; i++)
-        new_sequence[i] = 0;
-
-    for (int i = 0; i < 100; i++)
-        new_sequence[partition[i]] += input[i];
-}
-
-void generate_random_partition(int* partition) {
-    for (int i = 0; i < 100; i++)
-        partition[i] = (int) rand() % 100;
+    long long residue = heap.data[0];
+    free(heap.data);
+    return residue;
 }
 
 long long hill_climb_2(long long* input) {
@@ -234,9 +238,8 @@ long long simulated_annealing_2(long long* input) {
                 intdup(new_partition, prepartition);
             }
         }
-        if(best_residue < global_best_residue) {
+        if(best_residue < global_best_residue)
             global_best_residue = best_residue;
-        }
     }
     return global_best_residue;
 }
@@ -259,21 +262,40 @@ long long repeated_random_2(long long* input) {
     return best_residue;
 }
 
+long long partition(long long* input, char* algorithm) {
+    long long answer;
+    if(strcmp(algorithm, "repeated_random") == 0) {
+        answer = repeated_random_2(input);
+    }
+    else if(strcmp(algorithm, "hill_climbing") == 0) {
+        answer = hill_climb_2(input);
+    }
+    else {
+        answer = simulated_annealing_2(input);
+    }
+    return answer;
+}
+
 long long random_move(long long* input, char* algorithm) {
     int solution[100];
     int new_solution[100];
     generate_random_solution(solution);
     long long best_residue = residue(input, solution);
     long long new_residue;
+    long long global_best_residue = best_residue;
     int total = 0;
+
+    time_t t;
+    srand((unsigned) time(&t));
     for (int i = 0; i < 25000; i++) {
         if (strcmp(algorithm, "repeated_random") == 0) {
             generate_random_solution(new_solution);
             new_residue = residue(input, new_solution);
-            if (new_residue < best_residue)
+            if (new_residue < best_residue) {
                 best_residue = new_residue;
+            }
         }
-        else if (strcmp(algorithm, "hill_climbing") == 0 || strcmp(algorithm, "simulated_annealing") == 0) {
+        else if (strcmp(algorithm, "hill_climbing") == 0) {
             intdup(solution, new_solution);
             generate_neighbor_solution(new_solution);
             new_residue = residue(input, new_solution);
@@ -281,7 +303,16 @@ long long random_move(long long* input, char* algorithm) {
                 best_residue = new_residue;
                 intdup(new_solution, solution);
             }
-            else if (strcmp(algorithm, "simulated_annealing") == 0) {
+        }
+        else{
+            intdup(solution, new_solution);
+            generate_neighbor_solution(new_solution);
+            new_residue = residue(input, new_solution);
+            if (new_residue < best_residue) {
+                best_residue = new_residue;
+                intdup(new_solution, solution);
+            }
+            else {
                 double T = pow(10., 10.) * pow(.8, (double) (i/300));
                 double probablity = exp(-(new_residue - best_residue)/T);
                 // printf("%f\n", T);
@@ -290,11 +321,18 @@ long long random_move(long long* input, char* algorithm) {
                     total += 1;
                     // printf("reaches probability\n");
                     intdup(new_solution, solution);
+                    best_residue = new_residue;
                 }
+            }
+            if(best_residue < global_best_residue) {
+                global_best_residue = best_residue;
             }
         }
     }
-    return best_residue;
+    if(strcmp(algorithm, "simulated_annealing") == 0)
+        return global_best_residue;
+    else
+        return best_residue;
 }
 
 int main(int argc, char* argv[]) {
@@ -312,13 +350,13 @@ int main(int argc, char* argv[]) {
         fscanf(fp, "%lld", &input[i]);
     }
 
-    printf("SA2 Residue:%lld\n", simulated_annealing_2(input));
-    printf("HC2 Residue:%lld\n", hill_climb_2(input));
-    printf("RR2 Residue:%lld\n", repeated_random_2(input));
-
     char* RR = "repeated_random";
     char* HC = "hill_climbing";
     char* SA = "simulated_annealing"; 
+
+    printf("SA2 Residue:%lld\n", partition(input, SA));
+    printf("HC2 Residue:%lld\n", partition(input, HC));
+    printf("RR2 Residue:%lld\n", partition(input, RR));
 
     printf("RR1 Residue:%lld\n", random_move(input, RR));
     printf("HC1 Residue:%lld\n", random_move(input, HC));
