@@ -8,15 +8,13 @@
 #include <time.h>
 #include <math.h>
 
-// void print_sequence(long long* sequence) {
-//     for (int i = 0; i < 100; i++) {
-//         printf("%lld\n", sequence[i]);
-//     }
-// }
+void print_sequence(long long* sequence) {
+    for (int i = 0; i < 100; i++) {
+        printf("%lld\n", sequence[i]);
+    }
+}
 
-
-
-//priority heap (heap is an array)
+//MAX HEAP (heap is an array)
 //inspired by http://robin-thomas.github.io/min-heap/
 typedef struct MaxHeap {
     long long *data;
@@ -25,7 +23,6 @@ typedef struct MaxHeap {
 
 ////////////////HEAP FUNCTIONS///////////////////////
 //inspired by http://robin-thomas.github.io/min-heap/
-
 void enqueue(MaxHeap *h, long long elem) {
     if(h->size > 0) {
         h->data = realloc(h->data,((h->size)+1)*sizeof(long long));
@@ -39,6 +36,7 @@ void enqueue(MaxHeap *h, long long elem) {
         h->data[i] = h->data[(i-1)/2];
         i = (i-1)/2;
     }
+    h->data[i] = elem;
 }
 
 void swap(long long *n, long long *m) {
@@ -78,16 +76,22 @@ long long kk(long long *A) {
     MaxHeap heap;
     heap.size = 0;
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 100; i++) {
         enqueue(&heap, A[i]);
     }
 
     while(heap.size > 1) {
         long long max1 = returnmax(&heap);
         long long max2 = returnmax(&heap);
+        if(max2 == 0) {
+            return max1;
+        }
         enqueue(&heap, max1 - max2);
     }
-    return heap.data[0];
+    int max2 = heap.data[0];
+    free(heap.data);
+    free(&A);
+    return max2;
 }
 
 long long repeated_random_2(long long* input) {
@@ -140,7 +144,6 @@ long long repeated_random_1(long long* input) {
             sum2 += group2[j];
         }
         long long residue = llabs(sum1 - sum2);
-        // printf("residue: %lld\n", residue);
         if (residue < best_residue) 
             best_residue = residue;
     }
@@ -149,6 +152,9 @@ long long repeated_random_1(long long* input) {
 }
 
 int main(int argc, char* argv[]) {
+    MaxHeap heap1;
+    heap1.size = 0;
+
     char* inputfile = argv[1];
 
     long long* input = malloc(100 * sizeof(int));
@@ -160,11 +166,8 @@ int main(int argc, char* argv[]) {
         fscanf(fp, "%lld", &input[i]);
     }
 
-    printf("%lld\n", repeated_random_1(input));
-    printf("%lld\n", repeated_random_2(input));
+    printf("RR1 Residue:%lld\n", repeated_random_1(input));
+    printf("RR2 Residue:%lld\n", repeated_random_2(input));
 
-    // test to see if loading input worked
-    // for (int i = 0; i < 100; i++) {
-    //     printf("%lld\n", input[i]);
-    // }
+
 }

@@ -2,7 +2,7 @@ import random
 
 def generate_inputs():
 	num_ints = 100
-	max_int = 10
+	max_int = 1000
 	import argparse
 
 	parser = argparse.ArgumentParser(description='Process some integers.')
