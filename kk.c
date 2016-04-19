@@ -7,11 +7,20 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
+
+void print_int_sequence(int* sequence) {
+    for (int i = 0; i < 100; i++) {
+        printf("%d\n", sequence[i]);
+    }
+    printf("\n\n\n");
+}
 
 void print_sequence(long long* sequence) {
     for (int i = 0; i < 100; i++) {
         printf("%lld\n", sequence[i]);
     }
+    printf("\n\n\n");
 }
 
 //MAX HEAP (heap is an array)
@@ -62,6 +71,13 @@ void heapify(MaxHeap *h, int i) {
     }
 }
 
+void intdup(int* src, int* dest)
+{
+    for (int i = 0; i < 100; i++) {
+        dest[i] = src[i];
+    }
+}
+
 long long returnmax(MaxHeap *h) {
     long long maxElt;
     maxElt = h->data[0];
@@ -90,7 +106,6 @@ long long kk(long long *A) {
     }
     int max2 = heap.data[0];
     free(heap.data);
-    free(&A);
     return max2;
 }
 
@@ -116,6 +131,57 @@ long long residue(long long* input, int* solution) {
             sum_2 += input[i];
     }
     return llabs(sum_1 - sum_2);
+}
+
+void sequence_from_partition(long long* new_sequence, int* partition, long long * input) {
+    for (int i = 0; i < 100; i++)
+        new_sequence[i] = 0;
+
+    for (int i = 0; i < 100; i++)
+        new_sequence[partition[i]] += input[i];
+}
+
+void generate_random_partition(int* partition) {
+    for (int i = 0; i < 100; i++)
+        partition[i] = (int) rand() % 100;
+}
+
+long long hill_climb_2(long long* input) {
+    int prepartition[100];
+    int new_partition[100];
+    long long new_sequence[100];
+    long long neighbor[100];
+    time_t t;
+    srand((unsigned) time(&t));
+
+
+    generate_random_partition(prepartition);
+    sequence_from_partition(new_sequence, prepartition, input);
+    long long best_residue = kk(new_sequence);
+    sequence_from_partition(new_sequence, prepartition, input);
+
+
+    for (int i = 0; i < 25000; ++i)
+    {
+        intdup(prepartition, new_partition);
+
+        int rand_index_i = (int) rand() % 100;
+        int rand_index_j = (int) rand() % 100;
+        int old_index = prepartition[rand_index_i];
+        while(old_index == rand_index_j)
+            rand_index_j = (int) rand() % 100;
+
+        new_partition[rand_index_i] = rand_index_j;
+        sequence_from_partition(neighbor, new_partition, input);
+
+        long long residue = kk(neighbor);
+        if(residue < best_residue) {
+            best_residue = residue;
+            sequence_from_partition(new_sequence, new_partition, input);
+        }
+    }
+    return best_residue;
+
 }
 
 long long repeated_random_2(long long* input) {
@@ -172,7 +238,7 @@ int main(int argc, char* argv[]) {
         fscanf(fp, "%lld", &input[i]);
     }
 
-    printf("RR1 Residue:%lld\n", repeated_random_1(input));
+    printf("HC1 Residue:%lld\n", hill_climb_2(input));
     printf("RR2 Residue:%lld\n", repeated_random_2(input));
 
 
