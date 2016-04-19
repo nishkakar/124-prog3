@@ -9,19 +9,19 @@
 #include <math.h>
 #include <string.h>
 
-void print_int_sequence(int* sequence) {
-    for (int i = 0; i < 100; i++) {
-        printf("%d\n", sequence[i]);
-    }
-    printf("\n\n\n");
-}
+// void print_int_sequence(int* sequence) {
+//     for (int i = 0; i < 100; i++) {
+//         printf("%d\n", sequence[i]);
+//     }
+//     printf("\n\n\n");
+// }
 
-void print_sequence(long long* sequence) {
-    for (int i = 0; i < 100; i++) {
-        printf("%lld\n", sequence[i]);
-    }
-    printf("\n\n\n");
-}
+// void print_sequence(long long* sequence) {
+//     for (int i = 0; i < 100; i++) {
+//         printf("%lld\n", sequence[i]);
+//     }
+//     printf("\n\n\n");
+// }
 
 //MAX HEAP (heap is an array)
 //inspired by http://robin-thomas.github.io/min-heap/
@@ -117,6 +117,19 @@ void generate_random_solution(int* solution) {
         else
             solution[i] = 1;
     }
+}
+
+void generate_neighbor_solution(int* solution) {
+    time_t t; 
+    srand((unsigned) time(&t));
+    int index_1 = (int) rand() % 100;
+    int index_2 = 0;
+    while (index_2 == index_1)
+        index_2 = (int) rand() % 100;
+    solution[index_1] *= -1;
+    double probablity = (double) rand()/(double) RAND_MAX;
+    if (probablity <= 0.5)
+        solution[index_2] *= -1;
 }
 
 long long residue(long long* input, int* solution) {
@@ -226,7 +239,6 @@ long long simulated_annealing_2(long long* input) {
         }
     }
     return global_best_residue;
-
 }
 
 long long repeated_random_2(long long* input) {
@@ -247,18 +259,43 @@ long long repeated_random_2(long long* input) {
     return best_residue;
 }
 
-long long repeated_random_1(long long* input) {
+long long random_move(long long* input, char* algorithm) {
     int solution[100];
+    int new_solution[100];
     generate_random_solution(solution);
     long long best_residue = residue(input, solution);
     long long new_residue;
+    int total = 0;
     for (int i = 0; i < 25000; i++) {
-        int new_solution[100];
-        generate_random_solution(new_solution);
-        new_residue = residue(input, new_solution);
-        if (new_residue < best_residue)
-            best_residue = new_residue;
+        if (strcmp(algorithm, "repeated_random") == 0) {
+            generate_random_solution(new_solution);
+            new_residue = residue(input, new_solution);
+            if (new_residue < best_residue)
+                best_residue = new_residue;
+        }
+        else if (strcmp(algorithm, "hill_climbing") == 0 || strcmp(algorithm, "simulated_annealing") == 0) {
+            // mempcy(new_solution, solution, 100 * sizeof(int));
+            intdup(solution, new_solution);
+            generate_neighbor_solution(new_solution);
+            new_residue = residue(input, new_solution);
+            if (new_residue < best_residue) {
+                best_residue = new_residue;
+                intdup(new_solution, solution);
+            }
+            else if (strcmp(algorithm, "simulated_annealing") == 0) {
+                double T = pow(10., 10.) * pow(.8, (double) (i/300));
+                double probablity = exp(-(new_residue - best_residue)/T);
+                // printf("%f\n", T);
+                // printf("residue difference: %lld\n", new_residue - best_residue);
+                if (((double) rand()/(double) RAND_MAX) <= probablity) {
+                    total += 1;
+                    // printf("reaches probability\n");
+                    intdup(new_solution, solution);
+                }
+            }
+        }
     }
+    printf("%d\n", total);
     return best_residue;
 }
 
@@ -281,5 +318,11 @@ int main(int argc, char* argv[]) {
     printf("HC2 Residue:%lld\n", hill_climb_2(input));
     printf("RR2 Residue:%lld\n", repeated_random_2(input));
 
+    char* RR = "repeated_random";
+    char* HC = "hill_climbing";
+    char* SA = "simulated_annealing"; 
 
+    printf("RR1 Residue:%lld\n", random_move(input, RR));
+    printf("HC1 Residue:%lld\n", random_move(input, HC));
+    printf("SA1 Residue:%lld\n", random_move(input, SA));
 }
