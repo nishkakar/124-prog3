@@ -6,10 +6,11 @@ declare -a residues=(0 0 0 0 0 0 0)
 
 >results.txt
 make kk
-for i in {1..50}
+for i in {1..500}
 do
     python generate_input.py "$i"
     arr=($(./kk input_$i.txt | sed 's/[^0-9]//g'))
+    echo ${arr[@]} >> results.txt
     for j in {0..6}
     do
         residues[$j]=$((${residues[$j]}+${arr[$j]}))
