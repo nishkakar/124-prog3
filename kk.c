@@ -56,8 +56,8 @@ void generate_neighbor_solution(int* solution) {
 }
 
 long long residue(long long* input, int* solution) {
-    int sum_1 = 0;
-    int sum_2 = 0;
+    long long sum_1 = 0;
+    long long sum_2 = 0;
     for (int i = 0; i < 100; i++) {
         if (solution[i] == 1)
             sum_1 += input[i];
@@ -283,7 +283,6 @@ long long random_move(long long* input, char* algorithm) {
     long long best_residue = residue(input, solution);
     long long new_residue;
     long long global_best_residue = best_residue;
-    int total = 0;
 
     time_t t;
     srand((unsigned) time(&t));
@@ -315,11 +314,7 @@ long long random_move(long long* input, char* algorithm) {
             else {
                 double T = pow(10., 10.) * pow(.8, (double) (i/300));
                 double probablity = exp(-(new_residue - best_residue)/T);
-                // printf("%f\n", T);
-                // printf("residue difference: %lld\n", new_residue - best_residue);
                 if (((double) rand()/(double) RAND_MAX) <= probablity) {
-                    total += 1;
-                    // printf("reaches probability\n");
                     intdup(new_solution, solution);
                     best_residue = new_residue;
                 }
@@ -354,18 +349,58 @@ int main(int argc, char* argv[]) {
     char* HC = "hill_climbing";
     char* SA = "simulated_annealing";
 
-    // printf("RESULTS: \n");
+    // printf("KK Residue:%lld\n", kk(input));
 
-    printf("KK Residue:%lld\n", kk(input));
+    // printf("RR1 Residue:%lld\n", random_move(input, RR));
+    // printf("HC1 Residue:%lld\n", random_move(input, HC));
+    // printf("SA1 Residue:%lld\n", random_move(input, SA));
 
-    printf("RR1 Residue:%lld\n", random_move(input, RR));
-    printf("HC1 Residue:%lld\n", random_move(input, HC));
-    printf("SA1 Residue:%lld\n", random_move(input, SA));
+    // printf("RR2 Residue:%lld\n", partition(input, RR));
+    // printf("HC2 Residue:%lld\n", partition(input, HC));
+    // printf("SA2 Residue:%lld\n", partition(input, SA));
 
-    printf("RR2 Residue:%lld\n", partition(input, RR));
-    printf("HC2 Residue:%lld\n", partition(input, HC));
-    printf("SA2 Residue:%lld\n", partition(input, SA));
+    // printf("\n");
+    // printf("\n");
 
-    printf("\n");
-    printf("\n");
+    clock_t start = clock(), diff;
+    kk(input);
+    diff = clock() - start;
+    int msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("KK Time:%d\n", msec);
+
+    start = clock();
+    random_move(input, RR);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("RR1 Time:%d\n", msec);
+
+    start = clock();
+    random_move(input, HC);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("HC1 Time:%d\n", msec);
+
+    start = clock();
+    random_move(input, SA);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("SA1 Time:%d\n", msec);
+
+    start = clock();
+    partition(input, RR);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("RR2 Time:%d\n", msec);
+
+    start = clock();
+    partition(input, HC);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("HC2 Time:%d\n", msec);
+
+    start = clock();
+    partition(input, SA);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("SA2 Time:%d\n", msec);
 }
