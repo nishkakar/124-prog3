@@ -18,6 +18,6 @@ do
 done
 for j in {0..6}
 do
-    residues[$j]=$(echo "scale=2; ${residues[$j]}/50" | bc)
+    residues[$j]=$(echo "scale=2; ${residues[$j]}/500" | bc)
 done
 echo ${residues[@]}

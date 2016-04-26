@@ -11,6 +11,7 @@
 
 ////HELPER FUNCTIONS//////
 
+// duplicates array
 void intdup(int* src, int* dest)
 {
     for (int i = 0; i < 100; i++) {
@@ -18,6 +19,7 @@ void intdup(int* src, int* dest)
     }
 }
 
+// debugging function
 void print_int_sequence(int* sequence) {
     for (int i = 0; i < 100; i++) {
         printf("%d\n", sequence[i]);
@@ -25,6 +27,7 @@ void print_int_sequence(int* sequence) {
     printf("\n\n\n");
 }
 
+// debugging function
 void print_sequence(long long* sequence) {
     for (int i = 0; i < 100; i++) {
         printf("%lld\n", sequence[i]);
@@ -32,6 +35,7 @@ void print_sequence(long long* sequence) {
     printf("\n\n\n");
 }
 
+// generates random solution for the random move interpretation
 void generate_random_solution(int* solution) {
     time_t t;
     for (int i = 0; i < 100; i++) {
@@ -43,6 +47,7 @@ void generate_random_solution(int* solution) {
     }
 }
 
+// generates neighbor solution for hill climbing and simulated annealing algorithms in the random move interpretation
 void generate_neighbor_solution(int* solution) {
     time_t t;
     int index_1 = (int) rand() % 100;
@@ -55,6 +60,7 @@ void generate_neighbor_solution(int* solution) {
         solution[index_2] *= -1;
 }
 
+// calculates the residue given the input array of random numbers and a solution array for the random move interpretation
 long long residue(long long* input, int* solution) {
     int sum_1 = 0;
     int sum_2 = 0;
@@ -67,6 +73,7 @@ long long residue(long long* input, int* solution) {
     return llabs(sum_1 - sum_2);
 }
 
+// given a partition, generates a new sequence that enforces the prepartition 
 void sequence_from_partition(long long* new_sequence, int* partition, long long * input) {
     for (int i = 0; i < 100; i++)
         new_sequence[i] = 0;
@@ -75,6 +82,7 @@ void sequence_from_partition(long long* new_sequence, int* partition, long long 
         new_sequence[partition[i]] += input[i];
 }
 
+// generates a random prepartition
 void generate_random_partition(int* partition) {
     for (int i = 0; i < 100; i++)
         partition[i] = (int) rand() % 100;
@@ -138,8 +146,7 @@ long long returnmax(MaxHeap *h) {
     return maxElt;
 }
 
-///KK ALGORITHM/////////////
-
+// KK Algorithm
 long long kk(long long *A) {
     MaxHeap heap;
     heap.size = 0;
@@ -161,6 +168,7 @@ long long kk(long long *A) {
     return residue;
 }
 
+// implements prepartition interpretation for hill climbing algorithm
 long long hill_climb_2(long long* input) {
     int prepartition[100];
     int new_partition[100];
@@ -197,6 +205,7 @@ long long hill_climb_2(long long* input) {
 
 }
 
+// implements prepartition interpretation for simulated annealing algorithm
 long long simulated_annealing_2(long long* input) {
     int prepartition[100];
     int new_partition[100];
@@ -210,7 +219,7 @@ long long simulated_annealing_2(long long* input) {
     long long best_residue = kk(new_sequence);
     long long global_best_residue = best_residue;
 
-    for (int i = 0; i < 25000; ++i)
+    for (int i = 0; i < 2500f0; ++i)
     {
         intdup(prepartition, new_partition);
 
@@ -244,6 +253,7 @@ long long simulated_annealing_2(long long* input) {
     return global_best_residue;
 }
 
+// implements prepartition interpretation for repeated random algorithm
 long long repeated_random_2(long long* input) {
     int prepartition[100];
     long long new_sequence[100];
@@ -262,6 +272,7 @@ long long repeated_random_2(long long* input) {
     return best_residue;
 }
 
+// logic for which prepartition algorithm will be called
 long long partition(long long* input, char* algorithm) {
     long long answer;
     if(strcmp(algorithm, "repeated_random") == 0) {
@@ -276,6 +287,7 @@ long long partition(long long* input, char* algorithm) {
     return answer;
 }
 
+// implements random move interpretation for repeated random, hill climbing, and simulated annealing algorithms
 long long random_move(long long* input, char* algorithm) {
     int solution[100];
     int new_solution[100];
@@ -283,7 +295,6 @@ long long random_move(long long* input, char* algorithm) {
     long long best_residue = residue(input, solution);
     long long new_residue;
     long long global_best_residue = best_residue;
-    int total = 0;
 
     time_t t;
     srand((unsigned) time(&t));
@@ -315,11 +326,7 @@ long long random_move(long long* input, char* algorithm) {
             else {
                 double T = pow(10., 10.) * pow(.8, (double) (i/300));
                 double probablity = exp(-(new_residue - best_residue)/T);
-                // printf("%f\n", T);
-                // printf("residue difference: %lld\n", new_residue - best_residue);
                 if (((double) rand()/(double) RAND_MAX) <= probablity) {
-                    total += 1;
-                    // printf("reaches probability\n");
                     intdup(new_solution, solution);
                     best_residue = new_residue;
                 }
@@ -343,9 +350,9 @@ int main(int argc, char* argv[]) {
 
     long long input[100];
 
+    // loads numbers from file into array
     FILE* fp;
     fp = fopen(inputfile, "r");
-
     for (int i = 0; i < 100; i++) {
         fscanf(fp, "%lld", &input[i]);
     }
@@ -353,8 +360,6 @@ int main(int argc, char* argv[]) {
     char* RR = "repeated_random";
     char* HC = "hill_climbing";
     char* SA = "simulated_annealing";
-
-    // printf("RESULTS: \n");
 
     printf("KK Residue:%lld\n", kk(input));
 
