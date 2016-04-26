@@ -62,8 +62,8 @@ void generate_neighbor_solution(int* solution) {
 
 // calculates the residue given the input array of random numbers and a solution array for the random move interpretation
 long long residue(long long* input, int* solution) {
-    int sum_1 = 0;
-    int sum_2 = 0;
+    long long sum_1 = 0;
+    long long sum_2 = 0;
     for (int i = 0; i < 100; i++) {
         if (solution[i] == 1)
             sum_1 += input[i];
@@ -361,16 +361,45 @@ int main(int argc, char* argv[]) {
     char* HC = "hill_climbing";
     char* SA = "simulated_annealing";
 
-    printf("KK Residue:%lld\n", kk(input));
+    clock_t start = clock(), diff;
+    kk(input);
+    diff = clock() - start;
+    int msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("KK Time:%d\n", msec);
 
-    printf("RR1 Residue:%lld\n", random_move(input, RR));
-    printf("HC1 Residue:%lld\n", random_move(input, HC));
-    printf("SA1 Residue:%lld\n", random_move(input, SA));
+    start = clock();
+    random_move(input, RR);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("RR1 Time:%d\n", msec);
 
-    printf("RR2 Residue:%lld\n", partition(input, RR));
-    printf("HC2 Residue:%lld\n", partition(input, HC));
-    printf("SA2 Residue:%lld\n", partition(input, SA));
+    start = clock();
+    random_move(input, HC);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("HC1 Time:%d\n", msec);
 
-    printf("\n");
-    printf("\n");
+    start = clock();
+    random_move(input, SA);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("SA1 Time:%d\n", msec);
+
+    start = clock();
+    partition(input, RR);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("RR2 Time:%d\n", msec);
+
+    start = clock();
+    partition(input, HC);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("HC2 Time:%d\n", msec);
+
+    start = clock();
+    partition(input, SA);
+    diff = clock() - start;
+    msec = diff * 1000 / CLOCKS_PER_SEC;
+    printf("SA2 Time:%d\n", msec);
 }

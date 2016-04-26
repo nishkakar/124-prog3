@@ -14,7 +14,7 @@ def generate_inputs():
 	f = open('input_' + str(file_num) + '.txt', 'w')
 	
 	for i in range(num_ints):
-		r = random.randint(1,max_int)
+		r = random.randint(1, max_int)
 		f.write(str(r) + '\n')
 
 	f.close()
